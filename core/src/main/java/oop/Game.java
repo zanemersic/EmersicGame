@@ -14,7 +14,10 @@ public class Game extends ApplicationAdapter {
     private Player player;
     private SpriteBatch batch;
     private Array<Bomb> bombs;
+
+    private Array<Acorn> acorns;
     private float bombSpawnTimer = 0f;
+    private float acornSpawnTimer = 0f;
 
     @Override
     public void create() {
@@ -26,8 +29,10 @@ public class Game extends ApplicationAdapter {
         this.batch = new SpriteBatch();
 
         this.bombs = new Array<>();
+        this.acorns = new Array<>();
 
         spawnBomb();
+        spawnAcorn();
     }
 
     @Override
@@ -41,6 +46,12 @@ public class Game extends ApplicationAdapter {
             bombSpawnTimer = 0f;
         }
 
+        acornSpawnTimer += delta;
+        if (acornSpawnTimer >= Config.getCollectibleSpawnTime()) {
+            spawnAcorn();
+            acornSpawnTimer = 0f;
+        }
+
         player.update(delta);
         for (Iterator<Bomb> it = bombs.iterator(); it.hasNext(); ) {
             Bomb bomb = it.next();
@@ -50,10 +61,21 @@ public class Game extends ApplicationAdapter {
             }
         }
 
+        for (Iterator<Acorn> it = acorns.iterator(); it.hasNext(); ) {
+            Acorn acorn = it.next();
+            acorn.update(delta);
+            if (acorn.isBelowScreen()) {
+                it.remove();
+            }
+        }
+
         batch.begin();
         player.render(batch);
         for (Bomb bomb: bombs) {
             bomb.render(batch);
+        }
+        for (Acorn acorn: acorns) {
+            acorn.render(batch);
         }
         batch.end();
 
@@ -62,6 +84,11 @@ public class Game extends ApplicationAdapter {
     private void spawnBomb() {
         Bomb bomb = new Bomb(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getBombWidth()),Gdx.graphics.getHeight(), Config.getBombWidth(), Config.getBombHeight(), gameAssets.getBombTexture());
         bombs.add(bomb);
+    }
+
+    private void spawnAcorn() {
+        Acorn acorn = new Acorn(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getAcornWidth()),Gdx.graphics.getHeight(), Config.getAcornWidth(), Config.getAcornHeight(), gameAssets.getAcornTexture());
+        acorns.add(acorn);
     }
 
     @Override
