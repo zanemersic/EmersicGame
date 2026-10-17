@@ -18,4 +18,8 @@ public abstract class GameObject {
     public void render(SpriteBatch batch) {
         batch.draw(texture, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
+
+    public boolean isBelowScreen() {
+        return rectangle.y + rectangle.height < 0;
+    }
 }
