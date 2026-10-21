@@ -17,6 +17,8 @@ public class Acorn extends DynamicGameObject implements Pool.Poolable {
         rectangle.y = 0f;
         speedX = 0f;
         speedY = 0f;
+        rotationSpeed = 0f;
+        rotation = 0f;
     }
 
     public void init(float x, float y) {
@@ -24,5 +26,7 @@ public class Acorn extends DynamicGameObject implements Pool.Poolable {
         rectangle.y = y;
         speedX = 0f;
         speedY = -Config.getAcornSpeed();
+        rotationSpeed = 0f;
+        rotation = 0f;
     }
 }

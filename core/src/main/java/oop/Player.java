@@ -13,6 +13,7 @@ public class Player extends DynamicGameObject {
     @Override
     public void update(float delta) {
         speedX = 0f;
+        rotationSpeed = 0f;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             speedX = -Config.getPlayerSpeed();
