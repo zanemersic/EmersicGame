@@ -22,4 +22,8 @@ public abstract class GameObject {
     public boolean isBelowScreen() {
         return rectangle.y + rectangle.height < 0;
     }
+
+    public boolean isOverlapping(GameObject object) {
+        return this.rectangle.overlaps(object.rectangle);
+    }
 }

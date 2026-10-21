@@ -4,6 +4,7 @@ package oop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class Assets {
     private Texture bombTexture;
@@ -14,6 +15,8 @@ public class Assets {
     private Sound avatarHurt;
     private Sound acornCollect;
 
+    private BitmapFont font;
+
     public void load() {
         playerTexture = new Texture("images/avatar.png");
         acornTexture = new Texture("images/acorn.png");
@@ -22,6 +25,8 @@ public class Assets {
 
         avatarHurt = Gdx.audio.newSound(Gdx.files.internal("sounds/hurt.mp3"));
         acornCollect = Gdx.audio.newSound(Gdx.files.internal("sounds/collect.mp3"));
+
+        font = new BitmapFont();
     }
 
     public Texture getBombTexture() {
@@ -48,6 +53,8 @@ public class Assets {
         return acornCollect;
     }
 
+    public BitmapFont getFont() { return font; }
+
     public void dispose() {
         playerTexture.dispose();
         acornTexture.dispose();
@@ -55,5 +62,6 @@ public class Assets {
         backgroundTexture.dispose();
         avatarHurt.dispose();
         acornCollect.dispose();
+        font.dispose();
     }
 }
