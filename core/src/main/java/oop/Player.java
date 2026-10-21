@@ -15,9 +15,9 @@ public class Player extends DynamicGameObject {
         speedX = 0f;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-            speedX = -700f;
+            speedX = -Config.getPlayerSpeed();
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-            speedX = 700f;
+            speedX = Config.getPlayerSpeed();
         }
 
         super.update(delta);

@@ -23,17 +23,27 @@ public class Game extends ApplicationAdapter {
     private int playerHealth = 100;
     private int playerScore = 0;
 
+    private GameBackground background;
+
     private GameText health;
     private GameText score;
     private GameText gameOver;
     private GameText finalScore;
+    private BombPool bombPool;
+    private AcornPool acornPool;
 
     @Override
     public void create() {
         this.gameAssets = new Assets();
         gameAssets.load();
 
+        this.background = new GameBackground(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),gameAssets.getBackgroundTexture());
+
+        this.bombPool = new BombPool(gameAssets.getBombTexture());
+        this.acornPool = new AcornPool(gameAssets.getAcornTexture());
+
         this.player = new Player(0,0, Config.getPlayerWidth(), Config.getPlayerHeight(), gameAssets.getPlayerTexture());
+
 
         this.batch = new SpriteBatch();
 
@@ -74,11 +84,14 @@ public class Game extends ApplicationAdapter {
                 bomb.update(delta);
                 if (bomb.isBelowScreen()) {
                     it.remove();
+                    bombPool.free(bomb);
                 }
                 else if (bomb.isOverlapping(player)) {
                     this.playerHealth -= Config.getBombDamage();
                     this.health.setText(String.valueOf(playerHealth));
+                    gameAssets.getAvatarHurt().play();
                     it.remove();
+                    bombPool.free(bomb);
                 }
             }
 
@@ -87,12 +100,15 @@ public class Game extends ApplicationAdapter {
                 acorn.update(delta);
                 if (acorn.isBelowScreen()) {
                     it.remove();
+                    acornPool.free(acorn);
                 }
                 else if (acorn.isOverlapping(player)) {
                     this.playerScore += 1;
                     this.score.setText(String.valueOf(playerScore));
                     finalScore.setText(String.valueOf(playerScore));
+                    gameAssets.getAcornCollect().play();
                     it.remove();
+                    acornPool.free(acorn);
                 }
             }
         }
@@ -102,7 +118,7 @@ public class Game extends ApplicationAdapter {
             gameOver.render(batch);
             finalScore.render(batch);
         } else {
-            batch.draw(gameAssets.getBackgroundTexture(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            background.render(batch);
             player.render(batch);
             for (Bomb bomb : bombs) {
                 bomb.render(batch);
@@ -118,12 +134,14 @@ public class Game extends ApplicationAdapter {
     }
 
     private void spawnBomb() {
-        Bomb bomb = new Bomb(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getBombWidth()),Gdx.graphics.getHeight(), Config.getBombWidth(), Config.getBombHeight(), gameAssets.getBombTexture());
+        Bomb bomb = bombPool.obtain();
+        bomb.init(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getBombWidth()), Gdx.graphics.getHeight());
         bombs.add(bomb);
     }
 
     private void spawnAcorn() {
-        Acorn acorn = new Acorn(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getAcornWidth()),Gdx.graphics.getHeight(), Config.getAcornWidth(), Config.getAcornHeight(), gameAssets.getAcornTexture());
+        Acorn acorn = acornPool.obtain();
+        acorn.init(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getAcornWidth()),Gdx.graphics.getHeight());
         acorns.add(acorn);
     }
 
