@@ -71,10 +71,10 @@ public class Game extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
 
         // TU BI MOGLA BIT TIPKA F1 SAMO MENI LINUX PAC NE PUSTI MET F1... :/
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G) && !debug) {
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.G) || Gdx.input.isKeyJustPressed(Input.Keys.F1)) && !debug) {
             debug = true;
             System.out.println("Debug ON");
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.G) && debug) {
+        } else if ((Gdx.input.isKeyJustPressed(Input.Keys.G) || Gdx.input.isKeyJustPressed(Input.Keys.F1)) && debug) {
             debug = false;
             System.out.println("Debug OFF");
         }
