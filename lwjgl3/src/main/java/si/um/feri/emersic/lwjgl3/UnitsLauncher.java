@@ -20,7 +20,7 @@ public class UnitsLauncher {
         configuration.setTitle("World Units Game");
         configuration.useVsync(false);
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
-        configuration.setWindowedMode(1200, 600);
+        configuration.setWindowedMode(1000, 800);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 
         return configuration;

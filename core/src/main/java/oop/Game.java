@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Input;
 
 import java.util.Iterator;
 
@@ -31,6 +32,8 @@ public class Game extends ApplicationAdapter {
     private GameText finalScore;
     private BombPool bombPool;
     private AcornPool acornPool;
+    private boolean debug = false;
+    private Debugger debugger;
 
     @Override
     public void create() {
@@ -50,6 +53,8 @@ public class Game extends ApplicationAdapter {
         this.bombs = new Array<>();
         this.acorns = new Array<>();
 
+        this.debugger = new Debugger(gameAssets.getFont());
+
         this.health = new GameText(gameAssets.getFont(), "100", Color.RED,10,Gdx.graphics.getHeight()-20,5, false, false);
         this.score = new GameText(gameAssets.getFont(), "0", Color.GREEN, 0,Gdx.graphics.getHeight()-20,5, true, false);
         this.gameOver = new GameText(gameAssets.getFont(), "GAME OVER", Color.BLUE, 0, 0, 10, true, true);
@@ -64,6 +69,15 @@ public class Game extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(0, 0f, 0, 1);
         float delta = Gdx.graphics.getDeltaTime();
+
+        // TU BI MOGLA BIT TIPKA F1 SAMO MENI LINUX PAC NE PUSTI MET F1... :/
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G) && !debug) {
+            debug = true;
+            System.out.println("Debug ON");
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.G) && debug) {
+            debug = false;
+            System.out.println("Debug OFF");
+        }
 
         if (playerHealth > 0) {
             bombSpawnTimer += delta;
@@ -131,6 +145,24 @@ public class Game extends ApplicationAdapter {
         }
         batch.end();
 
+        if (debug) {
+            debugger.drawGrid(batch);
+            debugger.showMemory(batch);
+
+            if (playerHealth > 0) {
+                debugger.drawBounds(batch, background);
+                debugger.drawBounds(batch, player);
+            }
+
+            for (Bomb bomb : bombs) {
+                debugger.drawBounds(batch, bomb);
+            }
+
+            for (Acorn acorn : acorns) {
+                debugger.drawBounds(batch, acorn);
+            }
+        }
+
     }
 
     private void spawnBomb() {
@@ -149,5 +181,6 @@ public class Game extends ApplicationAdapter {
     public void dispose() {
         gameAssets.dispose();
         batch.dispose();
+        debugger.dispose();
     }
 }
