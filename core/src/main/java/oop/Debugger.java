@@ -53,6 +53,16 @@ public class Debugger {
         batch.end();
     }
 
+    public void drawCircle(Batch batch, float x, float y, float radius) {
+        DebugRender.setProjectionMatrix(batch.getProjectionMatrix());
+        DebugRender.begin(ShapeRenderer.ShapeType.Line); // DebugRender.begin(ShapeRenderer.ShapeType.Filled);
+        DebugRender.setColor(Color.RED);
+
+        DebugRender.circle(x, y, radius);
+
+        DebugRender.end();
+    }
+
     public void dispose() {
         DebugRender.dispose();
     }

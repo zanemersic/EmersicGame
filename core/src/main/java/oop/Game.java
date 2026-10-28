@@ -116,15 +116,21 @@ public class Game extends ApplicationAdapter {
             for (Iterator<Acorn> it = acorns.iterator(); it.hasNext(); ) {
                 Acorn acorn = it.next();
                 acorn.update(delta);
+
                 if (acorn.isBelowScreen()) {
                     it.remove();
                     acornPool.free(acorn);
-                }
-                else if (acorn.isOverlapping(player)) {
-                    this.playerScore += 1;
-                    this.score.setText(String.valueOf(playerScore));
+                } else if (acorn.isOverlapping(player)) {
+                    playerScore++;
+                    score.setText(String.valueOf(playerScore));
                     finalScore.setText(String.valueOf(playerScore));
                     gameAssets.getAcornCollect().play();
+
+                    particleSystem.spawnAcornBurst(
+                        acorn.rectangle.x + acorn.rectangle.width / 2f,
+                        acorn.rectangle.y + acorn.rectangle.height / 2f
+                    );
+
                     it.remove();
                     acornPool.free(acorn);
                 }
@@ -157,6 +163,13 @@ public class Game extends ApplicationAdapter {
             camera.resetCamera();
         }
 
+        if (playerHealth <= 0) {
+            for (Bomb bomb : bombs) {
+                bomb.stopSparks();
+            }
+        }
+
+        particleSystem.update(delta);
         camera.update();
         batch.setProjectionMatrix(camera.getCombined());
 
@@ -176,11 +189,13 @@ public class Game extends ApplicationAdapter {
             health.render(batch);
             score.render(batch);
         }
+        particleSystem.render(batch);
         batch.end();
 
         if (debug) {
             debugger.drawGrid(batch);
             debugger.showMemory(batch);
+            //debugger.drawCircle(batch, 300f, 200f, 50f);
 
             if (playerHealth > 0) {
                 debugger.drawBounds(batch, background);
@@ -201,6 +216,12 @@ public class Game extends ApplicationAdapter {
     private void spawnBomb() {
         Bomb bomb = bombPool.obtain();
         bomb.init(MathUtils.random(0f, Gdx.graphics.getWidth() - Config.getBombWidth()), Gdx.graphics.getHeight());
+        bomb.setSparks(
+            particleSystem.spawnBombSpark(
+                bomb.rectangle.x + bomb.rectangle.width / 2f,
+                bomb.rectangle.y + bomb.rectangle.height / 2f
+            )
+        );
         bombs.add(bomb);
     }
 
