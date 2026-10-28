@@ -34,6 +34,8 @@ public class Game extends ApplicationAdapter {
     private AcornPool acornPool;
     private boolean debug = false;
     private Debugger debugger;
+    private Camera camera;
+    private ParticleSystem particleSystem;
 
     @Override
     public void create() {
@@ -60,6 +62,8 @@ public class Game extends ApplicationAdapter {
         this.gameOver = new GameText(gameAssets.getFont(), "GAME OVER", Color.BLUE, 0, 0, 10, true, true);
         this.finalScore = new GameText(gameAssets.getFont(), "0", Color.YELLOW, 0, 200, 10, true, true);
 
+        this.camera = new Camera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.particleSystem = new ParticleSystem();
 
         spawnBomb();
         spawnAcorn();
@@ -127,6 +131,35 @@ public class Game extends ApplicationAdapter {
             }
         }
 
+        if (debug) {
+            if (Gdx.input.isKeyPressed(Input.Keys.I)) {
+                camera.updateDebugCamera(delta, "UP");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+                camera.updateDebugCamera(delta, "DOWN");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+                camera.updateDebugCamera(delta, "LEFT");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+                camera.updateDebugCamera(delta, "RIGHT");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+                camera.updateDebugCamera(delta, "ZOOMIN");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+                camera.updateDebugCamera(delta, "ZOOMOUT");
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                camera.resetCamera();
+            }
+        } else {
+            camera.resetCamera();
+        }
+
+        camera.update();
+        batch.setProjectionMatrix(camera.getCombined());
+
         batch.begin();
         if (playerHealth <= 0) {
             gameOver.render(batch);
@@ -182,5 +215,6 @@ public class Game extends ApplicationAdapter {
         gameAssets.dispose();
         batch.dispose();
         debugger.dispose();
+        particleSystem.dispose();
     }
 }
