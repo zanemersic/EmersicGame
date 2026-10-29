@@ -107,6 +107,11 @@ public class EmersicGame extends ApplicationAdapter {
         draw();
 
         batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.circle(Gdx.graphics.getWidth() - 50, Gdx.graphics.getHeight() - 50, 50);
+        shapeRenderer.end();
     }
 
     private void handleInput() {
