@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.Iterator;
 
@@ -31,6 +32,9 @@ public class EmersicGame extends ApplicationAdapter {
     private float collectibleSpawnTime;  // in seconds
     private int acornsCollected;
     private float bombSpawnTime;  // in seconds
+
+    private float pointSpawnTime;
+    private float invincibleTime;
     private int health;
 
     private static final float AVATAR_SPEED = 700f;
@@ -40,6 +44,10 @@ public class EmersicGame extends ApplicationAdapter {
     private static final float BOMB_DAMAGE = 25f;
     private static final float BOMB_SPAWN_TIME = 2f;  // in seconds
 
+    private static final float POINT_SPAWN = 1f;
+    private static final float INVINCIBLE_LENGTH = 3f;
+    private boolean invincible = false;
+
     private static final float AVATAR_WIDTH = 200f;
     private static final float AVATAR_HEIGHT = 200f;
 
@@ -48,6 +56,8 @@ public class EmersicGame extends ApplicationAdapter {
 
     private static final float BOMB_WIDTH = 70f;
     private static final float BOMB_HEIGHT = 70f;
+    private int counter = 3;
+    private ShapeRenderer shapeRenderer;
 
     @Override
     public void create() {
@@ -64,6 +74,9 @@ public class EmersicGame extends ApplicationAdapter {
 
         //font = new BitmapFont(Gdx.files.internal("fonts/ArcadeClassic.ttf"));
         font = new BitmapFont();
+
+        // Naloga 2
+        shapeRenderer = new ShapeRenderer();
 
         avatar = new Rectangle();
         avatar.x = Gdx.graphics.getWidth() / 2f - AVATAR_WIDTH / 2f;
@@ -109,6 +122,17 @@ public class EmersicGame extends ApplicationAdapter {
         float elapsedTime = (TimeUtils.nanosToMillis(TimeUtils.nanoTime()) / 1000f);
         if (elapsedTime - collectibleSpawnTime > COLLECTIBLE_SPAWN_TIME) spawnCollectible();
         if (elapsedTime - bombSpawnTime > BOMB_SPAWN_TIME) spawnBomb();
+        if (elapsedTime - pointSpawnTime > POINT_SPAWN) increasePoint();
+        if (elapsedTime - invincibleTime > INVINCIBLE_LENGTH) {
+            invincible = false;
+        } else {
+            invincible = true;
+        }
+        if (elapsedTime - invincibleTime > POINT_SPAWN) {
+            counter -= 1;
+        } else {
+            counter = 3;
+        }
 
         for (Iterator<Rectangle> it = collectibles.iterator(); it.hasNext(); ) {
             Rectangle acorn = it.next();
@@ -130,21 +154,30 @@ public class EmersicGame extends ApplicationAdapter {
                 it.remove();
             }
             if (bomb.overlaps(avatar)) {
-                health -= BOMB_DAMAGE;
-                avatarHurt.play();
-                it.remove();
+                if (invincible) {
+                    it.remove();
+                } else {
+                    health -= BOMB_DAMAGE;
+                    avatarHurt.play();
+                    it.remove();
+                    invincibleTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) / 1000f;
+                }
             }
         }
     }
 
     private void draw() {
-        batch.draw(
-            backgroundTexture,
-            0,
-            0,
-            Gdx.graphics.getWidth(),
-            Gdx.graphics.getHeight()
-        );
+        if (!invincible) {
+            batch.draw(
+                backgroundTexture,
+                0,
+                0,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight()
+            );
+        } else {
+            ScreenUtils.clear(0, 0f, 1, 1);
+        }
 
 
         if (health <= 0) {
@@ -192,6 +225,19 @@ public class EmersicGame extends ApplicationAdapter {
             "ACORNS: " + acornsCollected,
             20f, Gdx.graphics.getHeight() - 60f
         );
+
+        if (invincible) {
+            font.setColor(Color.ORANGE);
+            font.draw(batch, "SHIELD " + counter, 20f, 20f);
+        }
+
+
+        // NALOGA 2
+        //shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        //shapeRenderer.setColor(Color.RED);
+        //shapeRenderer.circle(Gdx.graphics.getWidth() - 50, Gdx.graphics.getHeight() - 50, 50);
+        //shapeRenderer.end();
+
     }
 
     private void moveLeft(float delta) {
@@ -202,8 +248,8 @@ public class EmersicGame extends ApplicationAdapter {
 
     private void moveRight(float delta) {
         avatar.x += AVATAR_SPEED * delta;
-        if (avatar.x > Gdx.graphics.getWidth() - avatar.width)
-            avatar.x = Gdx.graphics.getWidth() - avatar.width;
+        if (avatar.x > Gdx.graphics.getWidth() / 2f - avatar.width)
+            avatar.x = Gdx.graphics.getWidth() / 2f - avatar.width;
     }
 
     private void spawnCollectible() {
@@ -225,11 +271,22 @@ public class EmersicGame extends ApplicationAdapter {
             TimeUtils.nanosToMillis(TimeUtils.nanoTime()) / 1000f;
     }
 
+    private void increasePoint() {
+        acornsCollected++;
+        pointSpawnTime = TimeUtils.nanosToMillis(TimeUtils.nanoTime()) / 1000f;
+    }
+
+    private void updateShield() {
+        counter--;
+    }
+
     private void spawnBomb() {
         Rectangle bomb = new Rectangle();
 
-        bomb.width = BOMB_WIDTH;
-        bomb.height = BOMB_HEIGHT;
+
+        // 1. Naloga
+        bomb.width = MathUtils.random(30f, 80f);
+        bomb.height = MathUtils.random(30f, 80f);
 
         bomb.x = MathUtils.random(
             0f,
@@ -253,5 +310,6 @@ public class EmersicGame extends ApplicationAdapter {
         bombTexture.dispose();
         avatarHurt.dispose();
         acornCollect.dispose();
+        shapeRenderer.dispose();
     }
 }
